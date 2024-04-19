@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { personas } from './personas.entity';
+import { receivable } from '../../collect/entities/receivable.entity';
 
 @Entity({
   name: 'clientes',
@@ -11,8 +20,16 @@ export class clientes {
   codigodirecto: number;
 
   @Column({ type: 'numeric' })
-  idestado: number;
+  idpersona: number;
 
   @Column({ type: 'numeric' })
-  idusuario: number;
+  idestado: number;
+
+  @OneToOne(() => personas)
+  @JoinColumn({ name: 'idpersona' })
+  infoPersona: personas;
+
+  @OneToMany(() => receivable, (receivable) => receivable.cliente)
+  @JoinColumn({ name: 'idcliente' })
+  receivables: receivable[];
 }

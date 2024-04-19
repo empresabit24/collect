@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CollectModule } from './collect/collect.module';
 import { JwtModule } from '@nestjs/jwt';
 import { REQUEST } from '@nestjs/core';
+
+import { CollectModule } from './collect/collect.module';
+
 import { createTypeOrmOptions } from './typeorm.config';
+
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [

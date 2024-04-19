@@ -4,7 +4,7 @@ import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 
 import { AuthGuard } from './infraestructure/auth/auth.guard';
 
-import { CreateTables1712788093235 } from './migrations/1712788093235-CreateTables';
+import { CreateTables1713237726733 } from './migrations/1713237726733-CreateTables';
 
 export const createTypeOrmOptions = async (
   request: ExecutionContext,
@@ -29,7 +29,7 @@ export const createTypeOrmOptions = async (
     database: access.primary_db.db_name,
     autoLoadEntities: true,
     schema: 'sch_main',
-    migrations: [CreateTables1712788093235],
+    migrations: [CreateTables1713237726733],
     migrationsRun: true,
   };
 };

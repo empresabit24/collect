@@ -4,10 +4,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { collect } from './collect.entity';
+import { clientes } from '../../infraestructure/entities';
 
 @Entity({
   name: 'receivable',
@@ -34,9 +37,20 @@ export class receivable {
   @CreateDateColumn()
   payday_limit: Date;
 
+  @Column({ type: 'numeric' })
+  state: number;
+
   @OneToMany(() => collect, (collect) => collect.receivable)
   @JoinColumn({ name: 'id_collect' })
   collects: collect[];
+
+  @OneToOne(() => clientes)
+  @JoinColumn({ name: 'idcliente' })
+  infoCliente: clientes;
+
+  @ManyToOne(() => clientes, (cliente) => cliente.receivables)
+  @JoinColumn({ name: 'idcliente' })
+  cliente: clientes;
 
   @BeforeInsert()
   formatAmount(): void {

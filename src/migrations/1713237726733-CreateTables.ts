@@ -1,21 +1,43 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTables1712788093235 implements MigrationInterface {
+export class CreateTables1713237726733 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    console.log("CREANDO TABLA 'receivable-state'");
+    await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "sch_main"."receivable-state" (
+            "id_receivable_state" SERIAL PRIMARY KEY,
+            "description" VARCHAR(20)
+            )
+        `);
+
+    // Insertar las descripciones
+    await queryRunner.query(`
+            INSERT INTO "sch_main"."receivable-state" ("description") VALUES  
+            ('PAGADO'), 
+            ('PENDIENTE'), 
+            ('POR VENCER'), 
+            ('EN FECHA'), 
+            ('VENCIDO')
+        `);
+
     console.log("CREANDO TABLA 'receivable'");
     await queryRunner.query(`
           CREATE TABLE IF NOT EXISTS "sch_main"."receivable"(
           "id_receivable" SERIAL PRIMARY KEY,
           "idcliente" INT NOT NULL,
-          "description" TEXT NOT NULL,
+          "description" VARCHAR(255) NOT NULL,
           "total_amount" DECIMAL(10,2) NOT NULL,
           "pending_amount" DECIMAL (10,2) NOT NULL DEFAULT 0,
           "payday_limit" TIMESTAMP WITH TIME ZONE NOT NULL,
           "iddocumentoventa" INT,
-           CONSTRAINT fk_documentoventa
+          "state" INT,
+          CONSTRAINT fk_receivable_state
+                FOREIGN KEY (state)
+                REFERENCES "sch_main"."receivable-state"("id_receivable_state"),
+          CONSTRAINT fk_documentoventa
                FOREIGN KEY (iddocumentoventa)
                REFERENCES "sch_main"."documentosventa"("iddocumentoventa"),
-           CONSTRAINT fk_cliente
+          CONSTRAINT fk_cliente
                FOREIGN KEY ("idcliente")
                REFERENCES "sch_main"."clientes"("idcliente")
           )
@@ -43,6 +65,7 @@ export class CreateTables1712788093235 implements MigrationInterface {
     await queryRunner.query(`
             DROP TABLE IF EXISTS sch_main.collect;
             DROP TABLE IF EXISTS sch_main.receivable;
+            DROP TABLE IF EXISTS sch_main.receivable-state;
         `);
   }
 }

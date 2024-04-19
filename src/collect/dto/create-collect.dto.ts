@@ -1,7 +1,7 @@
 import {
   IsDateString,
-  IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   Min,
 } from 'class-validator';
@@ -10,8 +10,13 @@ import { Transform } from 'class-transformer';
 export class CreateCollectDto {
   @IsNumber()
   @IsPositive()
-  @IsNotEmpty()
+  @IsOptional()
   id_receivable;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  idcliente;
 
   @IsNumber()
   @IsPositive()

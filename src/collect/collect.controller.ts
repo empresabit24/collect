@@ -1,11 +1,15 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { CollectService } from './collect.service';
+import { CollectService } from './usecases/collect.service';
 import { CreateCollectDto } from './dto/create-collect.dto';
 import { CreateReceivableDto } from './dto/create-receivable.dto';
+import { ActualizarEstadoService } from './usecases/actualizar-estado.service';
 
 @Controller('collect')
 export class CollectController {
-  constructor(private readonly collectService: CollectService) {}
+  constructor(
+    private readonly collectService: CollectService,
+    private readonly updateStateService: ActualizarEstadoService,
+  ) {}
 
   @Post('createReceivable')
   createReceivable(@Body() createReceivableDto: CreateReceivableDto) {
@@ -16,13 +20,28 @@ export class CollectController {
     return this.collectService.createCollect(createCollectDto);
   }
 
-  @Get()
-  findAll() {
-    return this.collectService.findAll();
+  @Get('allClients')
+  findClientReceivables() {
+    return this.collectService.findAllReceivablesForAllClients();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.collectService.findOne(+id);
+  @Get('client/:idClient')
+  findAllReceivablesByClient(@Param('idClient') idClient: number) {
+    return this.collectService.findAllReceivablesByClient(idClient);
+  }
+
+  @Get('receivable/:idReceivable')
+  findOneReceivable(@Param('idReceivable') idReceivable: number) {
+    return this.collectService.findOneReceivable(idReceivable);
+  }
+
+  @Get('receivables-week')
+  receivablesOfTheWeek() {
+    return this.collectService.findReceivablesOfTheWeek();
+  }
+
+  @Get('updateState')
+  updateReceivableState() {
+    return this.updateStateService.updateReceivablesState();
   }
 }
