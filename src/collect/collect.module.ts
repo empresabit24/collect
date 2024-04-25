@@ -6,14 +6,16 @@ import { InfraestructureModule } from '../infraestructure/infraestructure.module
 import { collect } from './entities/collect.entity';
 import { receivable } from './entities/receivable.entity';
 import { ActualizarEstadoService } from './usecases/actualizar-estado.service';
+import { CollectionReportService } from './usecases/collection-report.service';
+import { receivableState } from './entities/receivable-state.entity';
 
 @Module({
   controllers: [CollectController],
   imports: [
-    TypeOrmModule.forFeature([collect, receivable]),
+    TypeOrmModule.forFeature([collect, receivable, receivableState]),
     InfraestructureModule,
   ],
-  providers: [CollectService, ActualizarEstadoService],
+  providers: [CollectService, ActualizarEstadoService, CollectionReportService],
   exports: [TypeOrmModule],
 })
 export class CollectModule {}

@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { collect } from './collect.entity';
 import { clientes } from '../../infraestructure/entities';
+import { receivableState } from './receivable-state.entity';
 
 @Entity({
   name: 'receivable',
@@ -40,7 +41,10 @@ export class receivable {
   @Column({ type: 'numeric' })
   state: number;
 
-  @OneToMany(() => collect, (collect) => collect.receivable)
+  @CreateDateColumn({ type: 'timestamp without time zone', default: 'NOW()' })
+  fecha_registro: Date;
+
+  @OneToMany(() => collect, (cobro) => cobro.cuentaCobrar)
   @JoinColumn({ name: 'id_collect' })
   collects: collect[];
 
@@ -51,6 +55,10 @@ export class receivable {
   @ManyToOne(() => clientes, (cliente) => cliente.receivables)
   @JoinColumn({ name: 'idcliente' })
   cliente: clientes;
+
+  @OneToOne(() => receivableState)
+  @JoinColumn({ name: 'state' })
+  tipo_estado: receivableState;
 
   @BeforeInsert()
   formatAmount(): void {

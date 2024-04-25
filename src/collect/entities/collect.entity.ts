@@ -2,7 +2,8 @@ import {
   BeforeInsert,
   Column,
   CreateDateColumn,
-  Entity, JoinColumn,
+  Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -27,9 +28,9 @@ export class collect {
   @CreateDateColumn()
   payment_date: Date;
 
-  @ManyToOne(() => receivable, (receivable) => receivable.collects)
+  @ManyToOne(() => receivable, (cuentaPorCobrar) => cuentaPorCobrar.collects)
   @JoinColumn({ name: 'id_receivable' })
-  receivable: receivable;
+  cuentaCobrar: receivable;
 
   @BeforeInsert()
   formatAmount() {

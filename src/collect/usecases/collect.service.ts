@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { CreateReceivableDto } from '../dto/create-receivable.dto';
 import { receivable } from '../entities/receivable.entity';
 import { clientes } from '../../infraestructure/entities';
+import { UpdatePaydayLimitDto } from '../dto/update-payday-limit.dto';
 
 @Injectable()
 export class CollectService {
@@ -362,6 +363,22 @@ export class CollectService {
     }, {});
 
     return groupedReceivables;
+  }
+
+  async updatePaydayLimit(updatePaydayLimitDto: UpdatePaydayLimitDto) {
+    try {
+      this.receivableRepository.update(
+        { id_receivable: updatePaydayLimitDto.id_receivable },
+        { payday_limit: updatePaydayLimitDto.new_payday_limit },
+      );
+
+      return {
+        success: true,
+        message: `Se reagendó la fecha del id_receivable ${updatePaydayLimitDto.id_receivable} a ${updatePaydayLimitDto.new_payday_limit}`,
+      };
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
 
   /*async findAllReceivablesByClient(idCliente: number) {
