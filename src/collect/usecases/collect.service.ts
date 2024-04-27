@@ -225,6 +225,7 @@ export class CollectService {
 
   async findAllReceivablesForAllClients(): Promise<any[]> {
     try {
+      this.logger.log('Buscando clientes con receivables...');
       const clientsWithReceivables = await this.clienteRepository
         .createQueryBuilder('cliente')
         .select([
@@ -268,6 +269,8 @@ export class CollectService {
           critical_payday_limit: criticalReceivable.critical_payday_limit,
         });
       }
+
+      this.logger.log('Búsqueda de clientes con receivables completada');
 
       return clientsWithCriticalReceivable.map((client) => ({
         idcliente: parseInt(client.cliente_idcliente),

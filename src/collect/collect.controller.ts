@@ -69,7 +69,6 @@ export class CollectController {
 
       res.send(excelBuffer);
       console.log('El buffer fue enviado');
-
     } catch (error) {
       console.error('Error al crear el reporte', error);
       res.status(500).send(`Error al crear el reporte ${error}`);

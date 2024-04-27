@@ -6,7 +6,7 @@ import { differenceInDays } from 'date-fns';
 
 @Injectable()
 export class ActualizarEstadoService {
-  private readonly logger = new Logger('CollectService');
+  private readonly logger = new Logger('ActualizarEstadoService');
   constructor(
     @InjectRepository(receivable)
     private readonly receivableRepository: Repository<receivable>,
@@ -21,15 +21,24 @@ export class ActualizarEstadoService {
 
       const today = new Date();
       for (const receivable of receivables) {
+        const daysDifference = Number(
+          differenceInDays(receivable.payday_limit, today),
+        );
         switch (receivable.state) {
           case 2:
-            if (differenceInDays(receivable.payday_limit, today) <= 7) {
+            if (daysDifference <= 1 && daysDifference >= 0) {
+              receivable.state = 4; // Cambia estado a 'en fecha'
+            } else if (today > receivable.payday_limit) {
+              receivable.state = 5; // Cambia estado a 'vencido'
+            } else if (daysDifference <= 7) {
               receivable.state = 3; // Cambia estado a 'por vencer'
             }
             break;
           case 3:
-            if (differenceInDays(receivable.payday_limit, today) >= 1) {
+            if (daysDifference <= 1 && daysDifference >= 0) {
               receivable.state = 4; // Cambia estado a 'en fecha'
+            } else if (today > receivable.payday_limit) {
+              receivable.state = 5; // Cambia estado a 'vencido'
             }
             break;
           case 4:
@@ -40,7 +49,7 @@ export class ActualizarEstadoService {
         }
         await this.receivableRepository.save(receivable);
       }
-      console.log('Actualización de estados completada.');
+      this.logger.log('Actualización de estados completada.');
     } catch (error) {
       console.error('Error al actualizar los estados:', error);
     }
