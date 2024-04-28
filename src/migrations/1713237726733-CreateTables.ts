@@ -28,9 +28,10 @@ export class CreateTables1713237726733 implements MigrationInterface {
           "description" VARCHAR(255) NOT NULL,
           "total_amount" DECIMAL(10,2) NOT NULL,
           "pending_amount" DECIMAL (10,2) NOT NULL DEFAULT 0,
-          "payday_limit" TIMESTAMP WITH TIME ZONE NOT NULL,
+          "payday_limit" DATE NOT NULL,
           "iddocumentoventa" INT,
           "state" INT,
+          "fecha_registro" DATE DEFAULT NOW(),
           CONSTRAINT fk_receivable_state
                 FOREIGN KEY (state)
                 REFERENCES "sch_main"."receivable-state"("id_receivable_state"),

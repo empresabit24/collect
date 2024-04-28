@@ -260,7 +260,7 @@ export class CollectService {
         const { state } = client;
         const criticalReceivable = await this.receivableRepository
           .createQueryBuilder('receivables')
-          .select('MAX(receivables.payday_limit)', 'critical_payday_limit')
+          .select('MIN(receivables.payday_limit)', 'critical_payday_limit')
           .where('receivables.state = :state', { state })
           .getRawOne();
 
@@ -330,42 +330,6 @@ export class CollectService {
         `Hubo un error al buscar la cuenta por cobrar. ${error}`,
       );
     }
-  }
-
-  async findReceivablesOfTheWeek() {
-    // se obtienen todos los receivables de los clientes
-    const receivables = await this.findAllReceivablesForAllClients();
-
-    const today = new Date();
-    const oneWeekLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-    // se filtran los receivables que corresponden a la semana
-    const filteredReceivables = receivables.filter((receivable) => {
-      const payday = new Date(receivable.infoReceivables.critical_payday_limit);
-      return payday >= today && payday <= oneWeekLater;
-    });
-
-    const sortedReceivables = filteredReceivables.sort((a, b) => {
-      const dateA = new Date(a.infoReceivables.critical_payday_limit);
-      const dateB = new Date(b.infoReceivables.critical_payday_limit);
-      return dateA.getTime() - dateB.getTime();
-    });
-
-    // Agrupar los resultados según el payday_limit
-    const groupedReceivables = sortedReceivables.reduce((acc, receivable) => {
-      const payday = new Date(receivable.infoReceivables.critical_payday_limit)
-        .toISOString()
-        .split('T')[0];
-      if (!acc[payday]) {
-        acc[payday] = [];
-      }
-
-      acc[payday].push(receivable);
-
-      return acc;
-    }, {});
-
-    return groupedReceivables;
   }
 
   async updatePaydayLimit(updatePaydayLimitDto: UpdatePaydayLimitDto) {

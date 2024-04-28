@@ -26,11 +26,11 @@ export class ActualizarEstadoService {
         );
         switch (receivable.state) {
           case 2:
-            if (daysDifference <= 1 && daysDifference >= 0) {
+            if (daysDifference < 1 && daysDifference >= 0) {
               receivable.state = 4; // Cambia estado a 'en fecha'
             } else if (today > receivable.payday_limit) {
               receivable.state = 5; // Cambia estado a 'vencido'
-            } else if (daysDifference <= 7) {
+            } else if (daysDifference < 7) {
               receivable.state = 3; // Cambia estado a 'por vencer'
             }
             break;

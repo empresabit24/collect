@@ -1,10 +1,13 @@
 import { Controller, Get, Post, Body, Param, Res } from '@nestjs/common';
+import { Response } from 'express';
+
 import { CollectService } from './usecases/collect.service';
-import { CreateCollectDto } from './dto/create-collect.dto';
-import { CreateReceivableDto } from './dto/create-receivable.dto';
 import { ActualizarEstadoService } from './usecases/actualizar-estado.service';
 import { CollectionReportService } from './usecases/collection-report.service';
-import { Response } from 'express';
+import { WeeklyReceivablesService } from './usecases/weekly-receivables.service';
+
+import { CreateCollectDto } from './dto/create-collect.dto';
+import { CreateReceivableDto } from './dto/create-receivable.dto';
 import { UpdatePaydayLimitDto } from './dto/update-payday-limit.dto';
 
 @Controller('collect')
@@ -13,6 +16,7 @@ export class CollectController {
     private readonly collectService: CollectService,
     private readonly updateStateService: ActualizarEstadoService,
     private readonly collectionReport: CollectionReportService,
+    private readonly weeklyReceivablesService: WeeklyReceivablesService,
   ) {}
 
   @Post('createReceivable')
@@ -46,7 +50,11 @@ export class CollectController {
 
   @Get('receivables-week')
   receivablesOfTheWeek() {
-    return this.collectService.findReceivablesOfTheWeek();
+    return this.weeklyReceivablesService.findReceivablesOfTheWeek();
+  }
+  @Get('receivables-overdue')
+  overdueReceivables() {
+    return this.weeklyReceivablesService.findOverdueReceivables();
   }
 
   @Get('updateState')
