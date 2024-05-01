@@ -5,13 +5,17 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCollectDto } from '../dto/create-collect.dto';
+
 import { InjectRepository } from '@nestjs/typeorm';
-import { collect } from '../entities/collect.entity';
 import { Repository } from 'typeorm';
-import { CreateReceivableDto } from '../dto/create-receivable.dto';
+
+import * as dateFns from 'date-fns';
+
+import { collect } from '../entities/collect.entity';
 import { receivable } from '../entities/receivable.entity';
 import { clientes } from '../../infraestructure/entities';
+import { CreateCollectDto } from '../dto/create-collect.dto';
+import { CreateReceivableDto } from '../dto/create-receivable.dto';
 import { UpdatePaydayLimitDto } from '../dto/update-payday-limit.dto';
 
 @Injectable()
@@ -333,32 +337,68 @@ export class CollectService {
   }
 
   async updatePaydayLimit(updatePaydayLimitDto: UpdatePaydayLimitDto) {
-    try {
-      this.receivableRepository.update(
-        { id_receivable: updatePaydayLimitDto.id_receivable },
-        { payday_limit: updatePaydayLimitDto.new_payday_limit },
-      );
+    // se busca la cuenta por cobrar
+    const receivable = await this.receivableRepository
+      .createQueryBuilder('receivable')
+      .where('receivable.id_receivable = :id_receivable', {
+        id_receivable: updatePaydayLimitDto.id_receivable,
+      })
+      .getOne();
 
-      return {
-        success: true,
-        message: `Se reagendó la fecha del id_receivable ${updatePaydayLimitDto.id_receivable} a ${updatePaydayLimitDto.new_payday_limit}`,
-      };
-    } catch (error) {
-      this.logger.error(error);
+    // validamos que esta cuenta por cobrar exista
+    if (!receivable) {
+      throw new BadRequestException(
+        `No se encontró la cuenta por cobrar con id ${updatePaydayLimitDto.id_receivable}`,
+      );
+    }
+    // actualización del payday_limit para dentro de una semana
+    if (updatePaydayLimitDto.oneWeekLater) {
+      this.logger.log('Actualización de fecha una semana después.');
+      try {
+        // Obtener el payday_limit actual
+        const currentPaydayLimit = receivable.payday_limit;
+
+        // Mover la fecha 7 días después
+        const newPaydayLimit = dateFns.addDays(currentPaydayLimit, 7);
+
+        // Actualizar el registro con la nueva fecha de límite de pago
+        await this.receivableRepository.update(
+          { id_receivable: updatePaydayLimitDto.id_receivable },
+          { payday_limit: newPaydayLimit },
+        );
+        this.logger.log(
+          'Se actualizó la cuenta por cobrar para dentro de una semana',
+        );
+
+        return {
+          success: true,
+          message: `La fecha de pago de la cuenta '${receivable.description}' se movió para ${dateFns.format(newPaydayLimit, 'dd/MM/yyyy')}`,
+        };
+      } catch (error) {
+        throw new InternalServerErrorException(
+          `Hubo un error, por favor revisar los logs`,
+        );
+      }
+    }
+    // Si se actualiza el receivable para una fecha personalizada
+    if (!updatePaydayLimitDto.oneWeekLater) {
+      this.logger.log(
+        'Actualización de fecha personalizada de una cuenta por cobrar.',
+      );
+      try {
+        this.receivableRepository.update(
+          { id_receivable: updatePaydayLimitDto.id_receivable },
+          { payday_limit: updatePaydayLimitDto.new_payday_limit },
+        );
+        this.logger.log('Actualización de fecha personalizada completada.');
+
+        return {
+          success: true,
+          message: `Se reagendó la fecha de la cuenta '${receivable.description}' a ${dateFns.format(updatePaydayLimitDto.new_payday_limit, 'dd/MM/yyyy')}`,
+        };
+      } catch (error) {
+        this.logger.error(error);
+      }
     }
   }
-
-  /*async findAllReceivablesByClient(idCliente: number) {
-    try {
-      return await this.receivableRepository
-          .createQueryBuilder('receivable')
-          .innerJoinAndSelect('receivable.infoCliente', 'cliente')
-          .innerJoinAndSelect('cliente.infoPersona', 'persona')
-          .leftJoinAndSelect('receivable.collects', 'collect')
-          .where('receivable.idcliente = :idcliente', { idcliente: idCliente })
-          .getOne();
-    } catch (error) {
-      console.log(error);
-    }
-  }*/
 }

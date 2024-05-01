@@ -9,6 +9,7 @@ import { WeeklyReceivablesService } from './usecases/weekly-receivables.service'
 import { CreateCollectDto } from './dto/create-collect.dto';
 import { CreateReceivableDto } from './dto/create-receivable.dto';
 import { UpdatePaydayLimitDto } from './dto/update-payday-limit.dto';
+import { FindReceivablesByDateDto } from './dto/find-receivables-by-date.dto';
 
 @Controller('collect')
 export class CollectController {
@@ -55,6 +56,15 @@ export class CollectController {
   @Get('receivables-overdue')
   overdueReceivables() {
     return this.weeklyReceivablesService.findOverdueReceivables();
+  }
+
+  @Post('receivables-by-date')
+  receivablesByDate(
+    @Body() findReceivablesByDateDto: FindReceivablesByDateDto,
+  ) {
+    return this.weeklyReceivablesService.findReceivablesByDate(
+      findReceivablesByDateDto,
+    );
   }
 
   @Get('updateState')
