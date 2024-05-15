@@ -29,7 +29,7 @@ export class CreateTables1713237726733 implements MigrationInterface {
           "total_amount" DECIMAL(10,2) NOT NULL,
           "pending_amount" DECIMAL (10,2) NOT NULL DEFAULT 0,
           "payday_limit" DATE NOT NULL,
-          "iddocumentoventa" INT,
+          "documento_venta" VARCHAR(255),
           "state" INT,
           "fecha_registro" DATE DEFAULT NOW(),
           CONSTRAINT fk_receivable_state
@@ -49,6 +49,7 @@ export class CreateTables1713237726733 implements MigrationInterface {
             CREATE TABLE IF NOT EXISTS "sch_main"."collect" (
                 "id_collect" SERIAL PRIMARY KEY,
                 "id_receivable" INT NOT NULL,
+                "description" VARCHAR(255),
                 "idformapago" INT NOT NULL,
                 "amount" DECIMAL(10,2) NOT NULL,
                 "payment_date" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

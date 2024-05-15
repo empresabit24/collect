@@ -19,6 +19,9 @@ export class collect {
   @Column({ type: 'numeric' })
   id_receivable: number;
 
+  @Column({ type: 'text' })
+  description: string;
+
   @Column({ type: 'numeric' })
   idformapago: number; //tabla: sch_main.formaspago
 

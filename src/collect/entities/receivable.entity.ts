@@ -26,8 +26,8 @@ export class receivable {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'numeric' })
-  iddocumentoventa: number; //tabla: sch_main.documentosventa
+  @Column({ type: 'text' })
+  documento_venta: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   total_amount: number;

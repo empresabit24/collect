@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsPositive,
+  IsString,
   Length,
   Min,
 } from 'class-validator';
@@ -31,8 +32,8 @@ export class CreateReceivableDto {
   @IsDateString()
   payday_limit: Date;
 
-  @IsNumber()
-  @IsPositive()
+  @IsString()
+  @Length(3, 255)
   @IsOptional()
-  iddocumentoventa: number;
+  documento_venta: string;
 }

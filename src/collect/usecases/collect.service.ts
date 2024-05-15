@@ -186,10 +186,13 @@ export class CollectService {
         newCollect.idformapago = createCollectDto.idformapago;
         newCollect.amount = collectAmount;
         newCollect.payment_date = createCollectDto.payment_date;
+        newCollect.description = createCollectDto.description;
 
         // Guarda el nuevo collect en la base de datos
         await this.collectRepository.save(newCollect);
-        this.logger.log(`Se registró el cobro de ${newCollect.amount}`);
+        this.logger.log(
+          `Se registró el cobro '${newCollect.description}' de ${newCollect.amount}`,
+        );
       }
 
       // Guarda los cambios en la base de datos
@@ -204,7 +207,7 @@ export class CollectService {
       );
       return {
         success: true,
-        message: `El cobro de S/ ${createCollectDto.amount} se registró con éxito.`,
+        message: `El cobro '${createCollectDto.description}'de S/ ${createCollectDto.amount} se registró con éxito.`,
       };
     }
   }
