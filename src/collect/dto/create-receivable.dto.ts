@@ -33,7 +33,6 @@ export class CreateReceivableDto {
   payday_limit: Date;
 
   @IsString()
-  @Length(3, 255)
   @IsOptional()
   documento_venta: string;
 }

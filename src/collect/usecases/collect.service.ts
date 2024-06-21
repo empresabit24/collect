@@ -10,6 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import * as dateFns from 'date-fns';
+import * as moment from 'moment';
+import 'moment/locale/es';
 
 import { collect } from '../entities/collect.entity';
 import { receivable } from '../entities/receivable.entity';
@@ -265,15 +267,23 @@ export class CollectService {
       const clientsWithCriticalReceivable = [];
       for (const client of clientsWithReceivables) {
         const { state } = client;
+        const idCliente = Number(client.cliente_idcliente);
+
         const criticalReceivable = await this.receivableRepository
           .createQueryBuilder('receivables')
-          .select('MIN(receivables.payday_limit)', 'critical_payday_limit')
-          .where('receivables.state = :state', { state })
+          .select('receivables.payday_limit', 'critical_payday_limit')
+          .addSelect(['receivables.id_receivable', 'receivables.idcliente'])
+          .where('receivables.idcliente = :idCliente', { idCliente })
+          .andWhere('receivables.state = :state', { state })
+          .orderBy('receivables.payday_limit', 'ASC')
+          .limit(1)
           .getRawOne();
 
         clientsWithCriticalReceivable.push({
           ...client,
-          critical_payday_limit: criticalReceivable.critical_payday_limit,
+          critical_payday_limit: moment(
+            criticalReceivable.critical_payday_limit,
+          ).add(5, 'hours'),
         });
       }
 
